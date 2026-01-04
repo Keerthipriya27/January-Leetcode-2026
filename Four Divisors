@@ -1,0 +1,26 @@
+class Solution:
+    def sumFourDivisors(self, nums: List[int]) -> int:
+        def isPrime(x):
+            if x < 2:
+                return False
+            i = 2
+            while i * i <= x:
+                if x % i == 0:
+                    return False
+                i += 1
+            return True
+        total = 0
+        for n in nums:
+            d = 2
+            while d * d <= n and n % d != 0:
+                d += 1
+            if d * d > n:
+                continue
+            other = n // d
+            if d == other:
+                continue
+            if isPrime(d) and isPrime(other):
+                total += 1 + d + other + n
+            elif other == d * d and isPrime(d):
+                total += 1 + d + other + n
+        return total
