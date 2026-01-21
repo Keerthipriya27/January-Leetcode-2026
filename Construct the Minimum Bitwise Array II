@@ -1,0 +1,17 @@
+class Solution:
+    def minBitwiseArray(self, nums: List[int]) -> List[int]:
+        result = []     
+        for num in nums:
+            if num % 2 == 0:
+                result.append(-1)
+                  continue        
+            pos = 0
+            temp = num          
+            while temp & (1 << pos):
+                pos += 1           
+            if pos > 0:
+                ans = num ^ (1 << (pos - 1))
+            else:
+                ans = -1          
+            result.append(ans)      
+        return result
