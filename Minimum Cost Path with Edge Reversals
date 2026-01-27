@@ -1,0 +1,23 @@
+class Solution:
+    def minCost(self, n: int, edges: List[List[int]]) -> int:
+        adj = [[] for _ in range(n)]
+        for start, end, weight in edges:
+            adj[start].append((end, weight)) 
+            adj[end].append((start, weight*2))       
+        min_cost = [inf] * n
+        min_cost[0] = 0
+        heap = [(0, 0)] 
+        processed = [False] * n       
+        while heap:
+            cost_so_far, node = heapq.heappop(heap)           
+            if node == n-1:
+                return cost_so_far            
+            if processed[node]:
+                continue
+            processed[node] = True           
+            for neighbor, edge_cost in adj[node]:
+                new_cost = cost_so_far + edge_cost
+                if new_cost < min_cost[neighbor]:
+                    min_cost[neighbor] = new_cost
+                    heapq.heappush(heap, (new_cost, neighbor))        
+        return -1
