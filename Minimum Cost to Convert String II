@@ -1,0 +1,71 @@
+from typing import List
+from collections import defaultdict
+import heapq
+
+class Solution:
+    def minimumCost(self, source: str, target: str, original: List[str], changed: List[str], cost: List[int]) -> int:
+        n = len(source)
+        INF = 10**18
+        
+        rules = defaultdict(list)
+        for o, c, w in zip(original, changed, cost):
+            rules[len(o)].append((o, c, w))
+        
+        graphs = {}
+        for L in rules:
+            g = defaultdict(list)
+            for o, c, w in rules[L]:
+                g[o].append((c, w))
+            graphs[L] = g
+        
+        memo = {}
+        
+        def dijkstra(start, end, L):
+            if (start, end) in memo:
+                return memo[(start, end)]
+            
+            g = graphs[L]
+            pq = [(0, start)]
+            dist = {start: 0}
+            
+            while pq:
+                d, node = heapq.heappop(pq)
+                if node == end:
+                    memo[(start, end)] = d
+                    return d
+                if d > dist.get(node, INF):
+                    continue
+                for nei, w in g[node]:
+                    nd = d + w
+                    if nd < dist.get(nei, INF):
+                        dist[nei] = nd
+                        heapq.heappush(pq, (nd, nei))
+            
+            memo[(start, end)] = INF
+            return INF
+        
+        dp = [INF]*(n+1)
+        dp[0] = 0
+        
+        lengths = list(graphs.keys())
+        
+        for i in range(n):
+            if dp[i] == INF:
+                continue
+            
+            if source[i] == target[i]:
+                dp[i+1] = min(dp[i+1], dp[i])
+            
+            for L in lengths:
+                if i+L > n:
+                    continue
+                s = source[i:i+L]
+                t = target[i:i+L]
+                if s == t:
+                    dp[i+L] = min(dp[i+L], dp[i])
+                else:
+                    cst = dijkstra(s, t, L)
+                    if cst < INF:
+                        dp[i+L] = min(dp[i+L], dp[i] + cst)
+        
+        return dp[n] if dp[n] < INF else -1
